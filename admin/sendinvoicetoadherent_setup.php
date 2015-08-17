@@ -17,8 +17,8 @@
  */
 
 /**
- * 	\file		admin/mymodule.php
- * 	\ingroup	mymodule
+ * 	\file		admin/sendinvoicetoadherent.php
+ * 	\ingroup	sendinvoicetoadherent
  * 	\brief		This file is an example module setup page
  * 				Put some comments here
  */
@@ -30,10 +30,10 @@ if (! $res) {
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
-require_once '../lib/mymodule.lib.php';
+require_once '../lib/sendinvoicetoadherent.lib.php';
 
 // Translations
-$langs->load("mymodule@mymodule");
+$langs->load("sendinvoicetoadherent@sendinvoicetoadherent");
 
 // Access control
 if (! $user->admin) {
@@ -77,7 +77,7 @@ if (preg_match('/del_(.*)/',$action,$reg))
 /*
  * View
  */
-$page_name = "MyModuleSetup";
+$page_name = "sendinvoicetoadherentSetup";
 llxHeader('', $langs->trans($page_name));
 
 // Subheader
@@ -86,13 +86,13 @@ $linkback = '<a href="' . DOL_URL_ROOT . '/admin/modules.php">'
 print_fiche_titre($langs->trans($page_name), $linkback);
 
 // Configuration header
-$head = mymoduleAdminPrepareHead();
+$head = sendinvoicetoadherentAdminPrepareHead();
 dol_fiche_head(
     $head,
     'settings',
-    $langs->trans("Module100000Name"),
+    $langs->trans("Module104710Name"),
     0,
-    "mymodule@mymodule"
+    "sendinvoicetoadherent@sendinvoicetoadherent"
 );
 
 // Setup page goes here

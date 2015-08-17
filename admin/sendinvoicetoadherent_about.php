@@ -18,7 +18,7 @@
 
 /**
  * 	\file		admin/about.php
- * 	\ingroup	mymodule
+ * 	\ingroup	sendinvoicetoadherent
  * 	\brief		This file is an example about page
  * 				Put some comments here
  */
@@ -30,10 +30,10 @@ if (! $res) {
 
 // Libraries
 require_once DOL_DOCUMENT_ROOT . "/core/lib/admin.lib.php";
-require_once '../lib/mymodule.lib.php';
+require_once '../lib/sendinvoicetoadherent.lib.php';
 
 // Translations
-$langs->load("mymodule@mymodule");
+$langs->load("sendinvoicetoadherent@sendinvoicetoadherent");
 
 // Access control
 if (! $user->admin) {
@@ -43,7 +43,7 @@ if (! $user->admin) {
 /*
  * View
  */
-$page_name = "MyModuleAbout";
+$page_name = "sendinvoicetoadherentAbout";
 llxHeader('', $langs->trans($page_name));
 
 // Subheader
@@ -52,13 +52,13 @@ $linkback = '<a href="' . DOL_URL_ROOT . '/admin/modules.php">'
 print_fiche_titre($langs->trans($page_name), $linkback);
 
 // Configuration header
-$head = mymoduleAdminPrepareHead();
+$head = sendinvoicetoadherentAdminPrepareHead();
 dol_fiche_head(
     $head,
     'about',
-    $langs->trans("Module100000Name"),
+    $langs->trans("Module104710Name"),
     0,
-    'mymodule@mymodule'
+    'sendinvoicetoadherent@sendinvoicetoadherent'
 );
 
 // About page goes here

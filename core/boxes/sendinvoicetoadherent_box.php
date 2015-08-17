@@ -18,7 +18,7 @@
 
 /**
  * 	\file		core/boxes/mybox.php
- * 	\ingroup	mymodule
+ * 	\ingroup	sendinvoicetoadherent
  * 	\brief		This file is a sample box definition file
  * 				Put some comments here
  */
@@ -27,13 +27,13 @@ include_once DOL_DOCUMENT_ROOT . "/core/boxes/modules_boxes.php";
 /**
  * Class to manage the box
  */
-class mymodulebox extends ModeleBoxes
+class sendinvoicetoadherentbox extends ModeleBoxes
 {
 
     public $boxcode = "mybox";
-    public $boximg = "mymodule@mymodule";
+    public $boximg = "sendinvoicetoadherent@sendinvoicetoadherent";
     public $boxlabel;
-    public $depends = array("mymodule");
+    public $depends = array("sendinvoicetoadherent");
     public $db;
     public $param;
     public $info_box_head = array();
@@ -62,7 +62,7 @@ class mymodulebox extends ModeleBoxes
 
         $this->max = $max;
 
-        //include_once DOL_DOCUMENT_ROOT . "/mymodule/class/mymodule.class.php";
+        //include_once DOL_DOCUMENT_ROOT . "/sendinvoicetoadherent/class/sendinvoicetoadherent.class.php";
 
         $text = $langs->trans("MyBoxDescription", $max);
         $this->info_box_head = array(

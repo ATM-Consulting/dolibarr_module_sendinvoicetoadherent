@@ -18,20 +18,20 @@
  */
 
 /**
- * 	\defgroup   mymodule     Module MyModule
+ * 	\defgroup   sendinvoicetoadherent     Module sendinvoicetoadherent
  *  \brief      Example of a module descriptor.
- *				Such a file must be copied into htdocs/mymodule/core/modules directory.
- *  \file       htdocs/mymodule/core/modules/modMyModule.class.php
- *  \ingroup    mymodule
- *  \brief      Description and activation file for module MyModule
+ *				Such a file must be copied into htdocs/sendinvoicetoadherent/core/modules directory.
+ *  \file       htdocs/sendinvoicetoadherent/core/modules/modsendinvoicetoadherent.class.php
+ *  \ingroup    sendinvoicetoadherent
+ *  \brief      Description and activation file for module sendinvoicetoadherent
  */
 include_once DOL_DOCUMENT_ROOT .'/core/modules/DolibarrModules.class.php';
 
 
 /**
- *  Description and activation class for module MyModule
+ *  Description and activation class for module sendinvoicetoadherent
  */
-class modMyModule extends DolibarrModules
+class modsendinvoicetoadherent extends DolibarrModules
 {
 	/**
 	 *   Constructor. Define names, constants, directories, boxes, permissions
@@ -46,9 +46,9 @@ class modMyModule extends DolibarrModules
 
 		// Id for module (must be unique).
 		// Use here a free id (See in Home -> System information -> Dolibarr for list of used modules id).
-		$this->numero = 100000; // 104000 to 104999 for ATM CONSULTING
+		$this->numero = 104710; // 104000 to 104999 for ATM CONSULTING
 		// Key text used to identify module (for permissions, menus, etc...)
-		$this->rights_class = 'mymodule';
+		$this->rights_class = 'sendinvoicetoadherent';
 
 		// Family can be 'crm','financial','hr','projects','products','ecm','technic','other'
 		// It is used to group modules in module setup page
@@ -56,7 +56,7 @@ class modMyModule extends DolibarrModules
 		// Module label (no space allowed), used if translation string 'ModuleXXXName' not found (where XXX is value of numeric property 'numero' of module)
 		$this->name = preg_replace('/^mod/i','',get_class($this));
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
-		$this->description = "Description of module MyModule";
+		$this->description = "Description of module sendinvoicetoadherent";
 		// Possible values for version are: 'development', 'experimental', 'dolibarr' or version
 		$this->version = '1.0';
 		// Key used in llx_const table to save module status enabled/disabled (where MYMODULE is value of property name of module in uppercase)
@@ -66,12 +66,12 @@ class modMyModule extends DolibarrModules
 		// Name of image file used for this module.
 		// If file is in theme/yourtheme/img directory under name object_pictovalue.png, use this->picto='pictovalue'
 		// If file is in module/img directory under name object_pictovalue.png, use this->picto='pictovalue@module'
-		$this->picto='mymodule@mymodule';
+		$this->picto='sendinvoicetoadherent@sendinvoicetoadherent';
 
 		// Defined all module parts (triggers, login, substitutions, menus, css, etc...)
-		// for default path (eg: /mymodule/core/xxxxx) (0=disable, 1=enable)
-		// for specific path of parts (eg: /mymodule/core/modules/barcode)
-		// for specific css file (eg: /mymodule/css/mymodule.css.php)
+		// for default path (eg: /sendinvoicetoadherent/core/xxxxx) (0=disable, 1=enable)
+		// for specific path of parts (eg: /sendinvoicetoadherent/core/modules/barcode)
+		// for specific css file (eg: /sendinvoicetoadherent/css/sendinvoicetoadherent.css.php)
 		//$this->module_parts = array(
 		//                        	'triggers' => 0,                                 	// Set this to 1 if module has its own trigger directory (core/triggers)
 		//							'login' => 0,                                    	// Set this to 1 if module has its own login method directory (core/login)
@@ -81,20 +81,20 @@ class modMyModule extends DolibarrModules
 		//                        	'tpl' => 0,                                      	// Set this to 1 if module overwrite template dir (core/tpl)
 		//							'barcode' => 0,                                  	// Set this to 1 if module has its own barcode directory (core/modules/barcode)
 		//							'models' => 0,                                   	// Set this to 1 if module has its own models directory (core/modules/xxx)
-		//							'css' => array('/mymodule/css/mymodule.css.php'),	// Set this to relative path of css file if module has its own css file
-	 	//							'js' => array('/mymodule/js/mymodule.js'),          // Set this to relative path of js file if module must load a js on all pages
+		//							'css' => array('/sendinvoicetoadherent/css/sendinvoicetoadherent.css.php'),	// Set this to relative path of css file if module has its own css file
+	 	//							'js' => array('/sendinvoicetoadherent/js/sendinvoicetoadherent.js'),          // Set this to relative path of js file if module must load a js on all pages
 		//							'hooks' => array('hookcontext1','hookcontext2')  	// Set here all hooks context managed by module
 		//							'dir' => array('output' => 'othermodulename'),      // To force the default directories names
-		//							'workflow' => array('WORKFLOW_MODULE1_YOURACTIONTYPE_MODULE2'=>array('enabled'=>'! empty($conf->module1->enabled) && ! empty($conf->module2->enabled)', 'picto'=>'yourpicto@mymodule')) // Set here all workflow context managed by module
+		//							'workflow' => array('WORKFLOW_MODULE1_YOURACTIONTYPE_MODULE2'=>array('enabled'=>'! empty($conf->module1->enabled) && ! empty($conf->module2->enabled)', 'picto'=>'yourpicto@sendinvoicetoadherent')) // Set here all workflow context managed by module
 		//                        );
 		$this->module_parts = array();
 
 		// Data directories to create when module is enabled.
-		// Example: this->dirs = array("/mymodule/temp");
+		// Example: this->dirs = array("/sendinvoicetoadherent/temp");
 		$this->dirs = array();
 
-		// Config pages. Put here list of php page, stored into mymodule/admin directory, to use to setup module.
-		$this->config_page_url = array("mymodule_setup.php@mymodule");
+		// Config pages. Put here list of php page, stored into sendinvoicetoadherent/admin directory, to use to setup module.
+		$this->config_page_url = array("sendinvoicetoadherent_setup.php@sendinvoicetoadherent");
 
 		// Dependencies
 		$this->hidden = false;			// A condition to hide module
@@ -103,7 +103,7 @@ class modMyModule extends DolibarrModules
 		$this->conflictwith = array();	// List of modules id this module is in conflict with
 		$this->phpmin = array(5,0);					// Minimum version of PHP required by module
 		$this->need_dolibarr_version = array(3,0);	// Minimum version of Dolibarr required by module
-		$this->langfiles = array("mymodule@mymodule");
+		$this->langfiles = array("sendinvoicetoadherent@sendinvoicetoadherent");
 
 		// Constants
 		// List of particular constants to add when module is enabled (key, 'chaine', value, desc, visible, 'current' or 'allentities', deleteonunactive)
@@ -113,8 +113,8 @@ class modMyModule extends DolibarrModules
 		$this->const = array();
 
 		// Array to add new pages in new tabs
-		// Example: $this->tabs = array('objecttype:+tabname1:Title1:mylangfile@mymodule:$user->rights->mymodule->read:/mymodule/mynewtab1.php?id=__ID__',  	// To add a new tab identified by code tabname1
-        //                              'objecttype:+tabname2:Title2:mylangfile@mymodule:$user->rights->othermodule->read:/mymodule/mynewtab2.php?id=__ID__',  	// To add another new tab identified by code tabname2
+		// Example: $this->tabs = array('objecttype:+tabname1:Title1:mylangfile@sendinvoicetoadherent:$user->rights->sendinvoicetoadherent->read:/sendinvoicetoadherent/mynewtab1.php?id=__ID__',  	// To add a new tab identified by code tabname1
+        //                              'objecttype:+tabname2:Title2:mylangfile@sendinvoicetoadherent:$user->rights->othermodule->read:/sendinvoicetoadherent/mynewtab2.php?id=__ID__',  	// To add another new tab identified by code tabname2
         //                              'objecttype:-tabname:NU:conditiontoremove');                                                     						// To remove an existing tab identified by code tabname
 		// where objecttype can be
 		// 'categories_x'	  to add a tab in category view (replace 'x' by type of category (0=product, 1=supplier, 2=customer, 3=member)
@@ -139,16 +139,16 @@ class modMyModule extends DolibarrModules
         $this->tabs = array();
 
         // Dictionaries
-	    if (! isset($conf->mymodule->enabled))
+	    if (! isset($conf->sendinvoicetoadherent->enabled))
         {
-        	$conf->mymodule=new stdClass();
-        	$conf->mymodule->enabled=0;
+        	$conf->sendinvoicetoadherent=new stdClass();
+        	$conf->sendinvoicetoadherent->enabled=0;
         }
 		$this->dictionaries=array();
         /* Example:
-        if (! isset($conf->mymodule->enabled)) $conf->mymodule->enabled=0;	// This is to avoid warnings
+        if (! isset($conf->sendinvoicetoadherent->enabled)) $conf->sendinvoicetoadherent->enabled=0;	// This is to avoid warnings
         $this->dictionaries=array(
-            'langs'=>'mylangfile@mymodule',
+            'langs'=>'mylangfile@sendinvoicetoadherent',
             'tabname'=>array(MAIN_DB_PREFIX."table1",MAIN_DB_PREFIX."table2",MAIN_DB_PREFIX."table3"),		// List of tables we want to see into dictonnary editor
             'tablib'=>array("Table1","Table2","Table3"),													// Label of tables
             'tabsql'=>array('SELECT f.rowid as rowid, f.code, f.label, f.active FROM '.MAIN_DB_PREFIX.'table1 as f','SELECT f.rowid as rowid, f.code, f.label, f.active FROM '.MAIN_DB_PREFIX.'table2 as f','SELECT f.rowid as rowid, f.code, f.label, f.active FROM '.MAIN_DB_PREFIX.'table3 as f'),	// Request to select fields
@@ -157,7 +157,7 @@ class modMyModule extends DolibarrModules
             'tabfieldvalue'=>array("code,label","code,label","code,label"),																				// List of fields (list of fields to edit a record)
             'tabfieldinsert'=>array("code,label","code,label","code,label"),																			// List of fields (list of fields for insert)
             'tabrowid'=>array("rowid","rowid","rowid"),																									// Name of columns with primary key (try to always name it 'rowid')
-            'tabcond'=>array($conf->mymodule->enabled,$conf->mymodule->enabled,$conf->mymodule->enabled)												// Condition to show each dictionary
+            'tabcond'=>array($conf->sendinvoicetoadherent->enabled,$conf->sendinvoicetoadherent->enabled,$conf->sendinvoicetoadherent->enabled)												// Condition to show each dictionary
         );
         */
 
@@ -190,14 +190,14 @@ class modMyModule extends DolibarrModules
 		// Example to declare a new Top Menu entry and its Left menu entry:
 		// $this->menu[$r]=array(	'fk_menu'=>0,			                // Put 0 if this is a top menu
 		//							'type'=>'top',			                // This is a Top menu entry
-		//							'titre'=>'MyModule top menu',
-		//							'mainmenu'=>'mymodule',
-		//							'leftmenu'=>'mymodule',
-		//							'url'=>'/mymodule/pagetop.php',
-		//							'langs'=>'mylangfile@mymodule',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+		//							'titre'=>'sendinvoicetoadherent top menu',
+		//							'mainmenu'=>'sendinvoicetoadherent',
+		//							'leftmenu'=>'sendinvoicetoadherent',
+		//							'url'=>'/sendinvoicetoadherent/pagetop.php',
+		//							'langs'=>'mylangfile@sendinvoicetoadherent',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 		//							'position'=>100,
-		//							'enabled'=>'$conf->mymodule->enabled',	// Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled.
-		//							'perms'=>'1',			                // Use 'perms'=>'$user->rights->mymodule->level1->level2' if you want your menu with a permission rules
+		//							'enabled'=>'$conf->sendinvoicetoadherent->enabled',	// Define condition to show or hide menu entry. Use '$conf->sendinvoicetoadherent->enabled' if entry must be visible if module is enabled.
+		//							'perms'=>'1',			                // Use 'perms'=>'$user->rights->sendinvoicetoadherent->level1->level2' if you want your menu with a permission rules
 		//							'target'=>'',
 		//							'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
 		// $r++;
@@ -205,14 +205,14 @@ class modMyModule extends DolibarrModules
 		// Example to declare a Left Menu entry into an existing Top menu entry:
 		// $this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=xxx',		    // Use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
 		//							'type'=>'left',			                // This is a Left menu entry
-		//							'titre'=>'MyModule left menu',
+		//							'titre'=>'sendinvoicetoadherent left menu',
 		//							'mainmenu'=>'xxx',
-		//							'leftmenu'=>'mymodule',
-		//							'url'=>'/mymodule/pagelevel2.php',
-		//							'langs'=>'mylangfile@mymodule',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+		//							'leftmenu'=>'sendinvoicetoadherent',
+		//							'url'=>'/sendinvoicetoadherent/pagelevel2.php',
+		//							'langs'=>'mylangfile@sendinvoicetoadherent',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 		//							'position'=>100,
-		//							'enabled'=>'$conf->mymodule->enabled',  // Define condition to show or hide menu entry. Use '$conf->mymodule->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
-		//							'perms'=>'1',			                // Use 'perms'=>'$user->rights->mymodule->level1->level2' if you want your menu with a permission rules
+		//							'enabled'=>'$conf->sendinvoicetoadherent->enabled',  // Define condition to show or hide menu entry. Use '$conf->sendinvoicetoadherent->enabled' if entry must be visible if module is enabled. Use '$leftmenu==\'system\'' to show if leftmenu system is selected.
+		//							'perms'=>'1',			                // Use 'perms'=>'$user->rights->sendinvoicetoadherent->level1->level2' if you want your menu with a permission rules
 		//							'target'=>'',
 		//							'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
 		// $r++;
@@ -248,7 +248,7 @@ class modMyModule extends DolibarrModules
 	{
 		$sql = array();
 
-		$result=$this->_load_tables('/mymodule/sql/');
+		$result=$this->_load_tables('/sendinvoicetoadherent/sql/');
 
 		return $this->_init($sql, $options);
 	}
