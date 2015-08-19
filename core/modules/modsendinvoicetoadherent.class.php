@@ -52,7 +52,7 @@ class modsendinvoicetoadherent extends DolibarrModules
 
 		// Family can be 'crm','financial','hr','projects','products','ecm','technic','other'
 		// It is used to group modules in module setup page
-		$this->family = "other";
+		$this->family = "ATM";
 		// Module label (no space allowed), used if translation string 'ModuleXXXName' not found (where XXX is value of numeric property 'numero' of module)
 		$this->name = preg_replace('/^mod/i','',get_class($this));
 		// Module description, used if translation string 'ModuleXXXDesc' not found (where XXX is value of numeric property 'numero' of module)
@@ -98,11 +98,11 @@ class modsendinvoicetoadherent extends DolibarrModules
 
 		// Dependencies
 		$this->hidden = false;			// A condition to hide module
-		$this->depends = array();		// List of modules id that must be enabled if this module is enabled
+		$this->depends = array('modAdherent');		// List of modules id that must be enabled if this module is enabled
 		$this->requiredby = array();	// List of modules id to disable if this one is disabled
 		$this->conflictwith = array();	// List of modules id this module is in conflict with
 		$this->phpmin = array(5,0);					// Minimum version of PHP required by module
-		$this->need_dolibarr_version = array(3,0);	// Minimum version of Dolibarr required by module
+		$this->need_dolibarr_version = array(3,7);	// Minimum version of Dolibarr required by module
 		$this->langfiles = array("sendinvoicetoadherent@sendinvoicetoadherent");
 
 		// Constants
@@ -167,24 +167,60 @@ class modsendinvoicetoadherent extends DolibarrModules
 		// Example:
 		//$this->boxes=array(array(0=>array('file'=>'myboxa.php','note'=>'','enabledbydefaulton'=>'Home'),1=>array('file'=>'myboxb.php','note'=>''),2=>array('file'=>'myboxc.php','note'=>'')););
 
+		$langs->load('sendinvoicetoadherent@sendinvoicetoadherent');
 		// Permissions
 		$this->rights = array();		// Permission array used by this module
 		$r=0;
 
 		// Add here list of permission defined by an id, a label, a boolean and two constant strings.
 		// Example:
-		// $this->rights[$r][0] = $this->numero + $r;	// Permission id (must not be already used)
-		// $this->rights[$r][1] = 'Permision label';	// Permission label
-		// $this->rights[$r][3] = 1; 					// Permission by default for new user (0/1)
-		// $this->rights[$r][4] = 'level1';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
-		// $this->rights[$r][5] = 'level2';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
-		// $r++;
-
+		$this->rights[$r][0] = $this->numero + $r;	// Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->trans('sendinvoicetoadherentRightRead');	// Permission label
+		$this->rights[$r][3] = 1; 					// Permission by default for new user (0/1)
+		$this->rights[$r][4] = 'read';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
+		$this->rights[$r][5] = '';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
+		$r++;
+	
+		$this->rights[$r][0] = $this->numero + $r;	// Permission id (must not be already used)
+		$this->rights[$r][1] = $langs->trans('sendinvoicetoadherentRightCreate');	// Permission label
+		$this->rights[$r][3] = 0; 					// Permission by default for new user (0/1)
+		$this->rights[$r][4] = 'create';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
+		$this->rights[$r][5] = '';				// In php code, permission will be checked by test if ($user->rights->permkey->level1->level2)
+		$r++;
 
 		// Main menu entries
 		$this->menu = array();			// List of menus to add
 		$r=0;
-
+		
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=members',			                // Put 0 if this is a top menu
+								'type'=>'left',			                // This is a Top menu entry
+								'titre'=>$langs->trans('sendinvoicetoadherentLeftMenuTitle'),
+								'mainmenu'=>'members',
+								'leftmenu'=>'sendinvoicetoadherent',
+								'url'=>'/sendinvoicetoadherent/sendinvoicetoadherent.php',
+								'langs'=>'sendinvoicetoadherent@sendinvoicetoadherent',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+								'position'=>100,
+								'enabled'=>'$conf->sendinvoicetoadherent->enabled',	// Define condition to show or hide menu entry. Use '$conf->sendinvoicetoadherent->enabled' if entry must be visible if module is enabled.
+								'perms'=>'$user->rights->sendinvoicetoadherent->read',			                // Use 'perms'=>'$user->rights->sendinvoicetoadherent->level1->level2' if you want your menu with a permission rules
+								'target'=>'',
+								'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
+		$r++;
+		
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=members,fk_leftmenu=sendinvoicetoadherent',			                // Put 0 if this is a top menu
+								'type'=>'left',			                // This is a Top menu entry
+								'titre'=>$langs->trans('sendinvoicetoadherentLeftMenuTitleList'),
+								'mainmenu'=>'sendinvoicetoadherent',
+								'leftmenu'=>'sendinvoicetoadherentlist',
+								'url'=>'/sendinvoicetoadherent/sendinvoicetoadherent.php?action=list',
+								'langs'=>'sendinvoicetoadherent@sendinvoicetoadherent',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+								'position'=>101,
+								'enabled'=>'$conf->sendinvoicetoadherent->enabled',	// Define condition to show or hide menu entry. Use '$conf->sendinvoicetoadherent->enabled' if entry must be visible if module is enabled.
+								'perms'=>'$user->rights->sendinvoicetoadherent->read',			                // Use 'perms'=>'$user->rights->sendinvoicetoadherent->level1->level2' if you want your menu with a permission rules
+								'target'=>'',
+								'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
+		$r++;
+		
+		
 		// Add here entries to declare new menus
 		//
 		// Example to declare a new Top Menu entry and its Left menu entry:

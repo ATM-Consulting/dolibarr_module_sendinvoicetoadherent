@@ -1,7 +1,40 @@
-Module104710Name = sendinvoicetoadherent
-Module104710Desc = sendinvoicetoadherent Descripion
+Module104710Name = Créer/envoyer facture aux adhérents
+Module104710Desc = Créer et envoie une facture aux adhérents n'ayant pas réglé leur cotisation
 
 ATMAbout = Ce module a été développé par <a href="http://www.atm-consulting.fr" target="_blank">ATM Consulting</a><br>Vous pouvez retrouver la documentation sur notre <a href="http://wiki.atm-consulting.fr/index.php/Accueil" target="_blank">wiki</a><br><br>Pour toute question technique ou retour, contactez-nous sur <a href="mailto:support@atm-consulting.fr">support@atm-consulting.fr</a><br><br>Pour toute question commerciale, contactez-nous sur <a href="mailto:contact@atm-consulting.fr">contact@atm-consulting.fr</a> ou au +33 9 77 19 50 70<br><br>Retrouvez nos autres modules sur <a href="http://www.dolistore.com/search.php?orderby=position&orderway=desc&search_query=atm&submit_search=Rechercher" target="_blank">Dolistore</a>
 
 sendinvoicetoadherentSetup = Configuration du module sendinvoicetoadherent
 sendinvoicetoadherentAbout = A propos du module sendinvoicetoadherent
+
+sendinvoicetoadherent_fk_facture=Id de la facture modèle de référence
+sendinvoicetoadherent_subject=Sujet du mail
+SENDINVOICETOADHERENT_SUBJECT_HELP=Des valeurs de remplacements sont disponible pour personnaliser le core du message :<br /><b>__NAME__</b> : Nom du tiers<br /><b>__REF__</b> : Référence de la facture
+sendinvoicetoadherent_message=Core du mail
+
+sendinvoicetoadherentTitle=Facturer cotisations
+sendinvoicetoadherentTitleList=Cotisations non réglés
+sendinvoicetoadherentTitleCreate=Création facture et envoi par email
+sendinvoicetoadherentLeftMenuTitle=Facturer cotisations
+sendinvoicetoadherentLeftMenuTitleList=Liste des adhérents
+sendinvoicetoadherentCount=Nombre de cotisation non réglés
+sendinvoicetoadherentViewLinkID=Liste des adhérents concernés
+sendinvoicetoadherentErrorCreateNotPermitted=Erreur : vous n'avez pas le droit nécéssaire pour poursuivre le cette action
+sendinvoicetoadherentErrorDateFac=Erreur : date facture invalide
+sendinvoicetoadherentErrorDate=Erreur : date adhésion ou fin adhésion invalide
+sendinvoicetoadherentErrorCreateTiers=Erreur : création de tiers pour %s adhérent(s)
+sendinvoicetoadherentErrorCreateFacture=Erreur : création de facture pour %s tiers
+sendinvoicetoadherentViewListErrorCreateTiers=Liste des adhérents dont la création d'un tiers a échoué
+sendinvoicetoadherentViewListErrorCreateFacture=Liste des tiers dont la création d'une facture a échoué
+sendinvoicetoadherentConfirmCreate=Création de %s facture(s)
+
+sendinvoicetoadherentRightRead=Consulter la liste
+sendinvoicetoadherentRightCreate=Créer/envoyer les factures
+
+sendinvoicetoadherentActionCreate=Créer/envoyer factures
+sendinvoicetoadherentActionCreateConfirm=Valider
+sendinvoicetoadherentDateFacture=Date facturation
+sendinvoicetoadherentCreateCotisation=Créer les cotisations
+sendinvoicetoadherentDateStartAdhesion=Date adhésion
+sendinvoicetoadherentDateEndAdhesion=Date fin adhésion
+sendinvoicetoadherentAmountAdhesion=Montant
+sendinvoicetoadherentLabelAdhesion=Libellé

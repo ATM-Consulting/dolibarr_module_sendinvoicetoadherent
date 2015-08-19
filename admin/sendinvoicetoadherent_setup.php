@@ -100,21 +100,45 @@ $form=new Form($db);
 $var=false;
 print '<table class="noborder" width="100%">';
 print '<tr class="liste_titre">';
-print '<td>'.$langs->trans("Parameters").'</td>'."\n";
-print '<td align="center" width="20">&nbsp;</td>';
-print '<td align="center" width="100">'.$langs->trans("Value").'</td>'."\n";
+print '<td width="30%">'.$langs->trans("Parameters").'</td>'."\n";
+print '<td align="center" width="20%">&nbsp;</td>';
+print '<td align="right" width="50%">'.$langs->trans("Value").'&nbsp;</td>'."\n";
 
-
-// Example with a yes / no select
 $var=!$var;
 print '<tr '.$bc[$var].'>';
-print '<td>'.$langs->trans("ParamLabel").'</td>';
+print '<td>'.$langs->trans("sendinvoicetoadherent_fk_facture").'</td>';
 print '<td align="center" width="20">&nbsp;</td>';
 print '<td align="right" width="300">';
 print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
 print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
-print '<input type="hidden" name="action" value="set_CONSTNAME">';
-print $form->selectyesno("CONSTNAME",$conf->global->CONSTNAME,1);
+print '<input type="hidden" name="action" value="set_SENDINVOICETOADHERENT_FK_FACTURE">';
+print '<input type="text" name="SENDINVOICETOADHERENT_FK_FACTURE" value="'.$conf->global->SENDINVOICETOADHERENT_FK_FACTURE.'" />';
+print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
+print '</form>';
+print '</td></tr>';
+
+$var=!$var;
+print '<tr '.$bc[$var].'>';
+print '<td>'.$langs->trans("sendinvoicetoadherent_subject").'</td>';
+print '<td align="center" width="20">&nbsp;</td>';
+print '<td align="right" width="300">';
+print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
+print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+print '<input type="hidden" name="action" value="set_SENDINVOICETOADHERENT_SUBJECT">';
+print '<input size="62" type="text" name="SENDINVOICETOADHERENT_SUBJECT" value="'.$conf->global->SENDINVOICETOADHERENT_SUBJECT.'" />';
+print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
+print '</form>';
+print '</td></tr>';
+
+$var=!$var;
+print '<tr '.$bc[$var].'>';
+print '<td>'.$langs->trans("sendinvoicetoadherent_message").'</td>';
+print '<td align="center" width="20">&nbsp;</td>';
+print '<td align="right" width="300">';
+print '<form method="POST" action="'.$_SERVER['PHP_SELF'].'">';
+print '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+print '<input type="hidden" name="action" value="set_SENDINVOICETOADHERENT_MESSAGE">';
+print img_picto($langs->trans('SENDINVOICETOADHERENT_SUBJECT_HELP'), 'info.png').'<textarea cols="60" rows="5" style="vertical-align:middle;" name="SENDINVOICETOADHERENT_MESSAGE">'.$conf->global->SENDINVOICETOADHERENT_MESSAGE.'</textarea>';
 print '<input type="submit" class="button" value="'.$langs->trans("Modify").'">';
 print '</form>';
 print '</td></tr>';
