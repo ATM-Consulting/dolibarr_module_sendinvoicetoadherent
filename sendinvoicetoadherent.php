@@ -42,11 +42,11 @@ function _liste(&$PDOdb, &$db, &$user, &$conf, &$langs, $footer=1)
 {
 	llxHeader('',$langs->trans('sendinvoicetoadherentTitle'),'','');
 	
-	$TError = $_SESSION['SENDTOINVOICETOADHERENT_ERRORS']['TError'];
-	$TErrorFac = $_SESSION['SENDTOINVOICETOADHERENT_ERRORS']['TErrorFac'];
+	$TError = $_SESSION['SENDTOINVOICETOADHERENT_TERROR'];
+	$TErrorFac = $_SESSION['SENDTOINVOICETOADHERENT_TERRORFAC'];
+	$TErrorMail = $_SESSION['SENDTOINVOICETOADHERENT_TERRORMAIL'];
 	
-	// Un BETWEEN est inclusif des 2 côtés
-	$sql="SELECT rowid FROM ".MAIN_DB_PREFIX."adherent a WHERE entity = ".$conf->entity." AND rowid NOT IN (SELECT fk_adherent FROM ".MAIN_DB_PREFIX."cotisation WHERE CURRENT_DATE BETWEEN dateadh AND datef)";
+	$sql = _getSql();
 	
   	$count = 0;
 	if ($PDOdb->Execute($sql))
@@ -94,7 +94,19 @@ function _liste(&$PDOdb, &$db, &$user, &$conf, &$langs, $footer=1)
 		}
 
 		echo '</td><tr>';
-	}	
+	}
+	
+	// Affiche les erreurs à propos des envois de mail
+	if ($TErrorMail)
+	{
+		echo '<tr><td width="20%">'.$langs->trans("sendinvoicetoadherentViewListErrorMailSend").'</td><td width="80%">';
+		foreach ($TErrorMail as $fk_societe)
+		{
+			 echo '<a target="_blank" style="float:left;" href="'.dol_buildpath('/societe/soc.php?socid='.$fk_societe, 1).'">'.img_picto('', 'object_user').$fk_societe.'&nbsp;</a>';
+		}
+
+		echo '</td><tr>';
+	}
 
 	echo '</table></div>';
 
@@ -177,8 +189,12 @@ function _create(&$PDOdb, &$db, &$user, &$conf, &$langs, $df=false, $ds=false, $
 
 function _create_and_send($PDOdb, $db, $user, $conf, $langs)
 {
-	unset($_SESSION['SENDTOINVOICETOADHERENT_ERRORS']);
+	unset($_SESSION['SENDTOINVOICETOADHERENT_TERROR']);
+	unset($_SESSION['SENDTOINVOICETOADHERENT_TERRORFAC']);
+	unset($_SESSION['SENDTOINVOICETOADHERENT_TERRORMAIL']);
+	
 	$error = 0;
+	$nb_mail_sent = 0;
 	
 	if(!$user->rights->sendinvoicetoadherent->create)
 	{
@@ -229,11 +245,11 @@ function _create_and_send($PDOdb, $db, $user, $conf, $langs)
 
 	if (!$error)
 	{
-		$sql="SELECT rowid FROM ".MAIN_DB_PREFIX."adherent a WHERE entity = ".$conf->entity." AND rowid NOT IN (SELECT fk_adherent FROM ".MAIN_DB_PREFIX."cotisation WHERE CURRENT_DATE BETWEEN dateadh AND datef)";
+		$sql = _getSql();
 		
 		if ($PDOdb->Execute($sql))
 		{
-			$TError = $TErrorFac = array();
+			$TError = $TErrorFac = $TErrorMail = array();
 			while ($row = $PDOdb->Get_line())
 			{
 				$ad = new Adherent($db);
@@ -277,23 +293,31 @@ function _create_and_send($PDOdb, $db, $user, $conf, $langs)
 					if ($facture->create($user) > 0) 
 					{
 						 $facture->validate($user);
-						 _sendByMail($db, $conf, $user, $langs, $facture, $societe, $label);
+						 if (!_sendByMail($db, $conf, $user, $langs, $facture, $societe, $label))
+						 {
+						 	$TErrorMail[] = $societe->id;
+						 }
 					}
-					else $TErrorFac[] = $societe;
-	
+					else $TErrorFac[] = $societe->id;
+
 				}
 				else
 				{
-					$TError[] = $ad;
+					$TError[] = $ad->id;
 				}
 	
 			}
 	
 			if (count($TError) > 0) setEventMessages($langs->trans('sendinvoicetoadherentErrorCreateTiers', count($TError)), null, 'errors');
 			if (count($TErrorFac) > 0) setEventMessages($langs->trans('sendinvoicetoadherentErrorCreateFacture', count($TErrorFac)), null, 'errors');
+			if (count($TErrorMail) > 0) setEventMessages($langs->trans('sendinvoicetoadherentErrorMailSend', count($TErrorMail)), null, 'errors');
 			else setEventMessages($langs->trans('sendinvoicetoadherentConfirmCreate', $PDOdb->Get_Recordcount()), null);
 	
-			$_SESSION['SENDTOINVOICETOADHERENT_ERRORS'] = array('TError' => $TError, 'TErrorFac' => $TErrorFac);
+			$_SESSION['SENDTOINVOICETOADHERENT_ERRORS'] = array('TError' => $TError, 'TErrorFac' => $TErrorFac, '');
+			
+			$_SESSION['SENDTOINVOICETOADHERENT_TERROR'] = $TError;
+			$_SESSION['SENDTOINVOICETOADHERENT_TERRORFAC'] = $TErrorFac;
+			$_SESSION['SENDTOINVOICETOADHERENT_TERRORMAIL'] = $TErrorMail;
 	
 			header('Location: '.dol_buildpath('/sendinvoicetoadherent/sendinvoicetoadherent.php?action=list', 2));
 			exit;
@@ -387,6 +411,26 @@ function _sendByMail(&$db, &$conf, &$user, &$langs, &$facture, &$societe, $label
 	);
 	
 	// Send mail
-	$CMail->sendfile();
-	
+	return $CMail->sendfile();
+}
+
+function _getSql()
+{
+	return "
+		SELECT a.rowid 
+		FROM llx_adherent a 
+		WHERE a.entity = 1 
+		AND a.rowid NOT IN (SELECT cc.fk_adherent FROM llx_cotisation cc WHERE CURRENT_DATE BETWEEN cc.dateadh AND cc.datef) # n'est pas dans la liste des adhérents ayant une cotisation pour l'année en cours
+		AND a.rowid NOT IN ( # n'est pas dans la liste des adhérents ayant une ou +sieurs facture (je prend la plus récente) dont la date est de moins d'un an (cotisation à l'année)
+		    SELECT aa.rowid     
+		    FROM llx_adherent aa 
+		    INNER JOIN llx_facture f ON (f.fk_soc = aa.fk_soc AND f.entity = 1 AND f.fk_statut = 1)
+		    WHERE f.datef = ( # filtre pour récupérer la facture la plus récente
+				SELECT MAX(ff.datef) 
+                FROM llx_facture ff 
+                WHERE ff.fk_soc = f.fk_soc
+		    )
+		    AND f.datef > (CURDATE() - INTERVAL 1 YEAR)
+		)
+	";
 }
