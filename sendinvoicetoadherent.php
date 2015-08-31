@@ -414,23 +414,32 @@ function _sendByMail(&$db, &$conf, &$user, &$langs, &$facture, &$societe, $label
 	return $CMail->sendfile();
 }
 
+//La dernière facture doit contenir la ligne de facture "Cotisation anuelle ..."
 function _getSql()
 {
+	global $conf;
+	
+	$fk_product_cotisation = $conf->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS;
+	
 	return "
 		SELECT a.rowid 
-		FROM llx_adherent a 
+		FROM ".MAIN_DB_PREFIX."adherent a 
 		WHERE a.entity = 1 
+		#AND a.statut <> -1 # Pas d'adhérent en brouillon
 		AND a.rowid NOT IN (SELECT cc.fk_adherent FROM llx_cotisation cc WHERE CURRENT_DATE BETWEEN cc.dateadh AND cc.datef) # n'est pas dans la liste des adhérents ayant une cotisation pour l'année en cours
 		AND a.rowid NOT IN ( # n'est pas dans la liste des adhérents ayant une ou +sieurs facture (je prend la plus récente) dont la date est de moins d'un an (cotisation à l'année)
 		    SELECT aa.rowid     
-		    FROM llx_adherent aa 
-		    INNER JOIN llx_facture f ON (f.fk_soc = aa.fk_soc AND f.entity = 1 AND f.fk_statut = 1)
-		    WHERE f.datef = ( # filtre pour récupérer la facture la plus récente
+		    FROM ".MAIN_DB_PREFIX."adherent aa 
+		    INNER JOIN ".MAIN_DB_PREFIX."facture f ON (f.fk_soc = aa.fk_soc AND f.entity = 1 AND f.fk_statut = 1)		    
+		    WHERE f.rowid IN (SELECT fd.fk_facture FROM llx_facturedet fd WHERE fk_product = ".$fk_product_cotisation.")
+		    AND f.datef = ( # filtre pour récupérer la facture la plus récente
 				SELECT MAX(ff.datef) 
-                FROM llx_facture ff 
+                FROM ".MAIN_DB_PREFIX."facture ff 
                 WHERE ff.fk_soc = f.fk_soc
 		    )
 		    AND f.datef > (CURDATE() - INTERVAL 1 YEAR)
 		)
 	";
 }
+
+//Fonction d'avoir automatique pour les factures non payé avec la ligne de "Cotisation anuelle ..." (affichage du Tiers/adhérent + num facture ~ montant)
