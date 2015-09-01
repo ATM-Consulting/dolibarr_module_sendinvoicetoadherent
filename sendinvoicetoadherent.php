@@ -20,7 +20,11 @@ function _action()
 
 	switch($action) {
 		case 'list':
-			_liste($PDOdb, $db, $user, $conf, $langs);
+			_list($PDOdb, $db, $user, $conf, $langs);
+
+			break;
+		case 'listAvoir':
+			_listAvoir($PDOdb, $db, $user, $conf, $langs);
 
 			break;
 		case 'create':
@@ -31,14 +35,18 @@ function _action()
 			_create_and_send($PDOdb, $db, $user, $conf, $langs);
 
 			break;
+		case 'createAvoir':
+			_createAvoir($PDOdb, $db, $user, $conf, $langs);
+
+			break;
 		default:
-			_liste($PDOdb, $db, $user, $conf, $langs);
+			_list($PDOdb, $db, $user, $conf, $langs);
 
 			break;
 	}
 }
 
-function _liste(&$PDOdb, &$db, &$user, &$conf, &$langs, $footer=1)
+function _list(&$PDOdb, &$db, &$user, &$conf, &$langs, $footer=1)
 {
 	llxHeader('',$langs->trans('sendinvoicetoadherentTitle'),'','');
 	
@@ -125,11 +133,111 @@ function _liste(&$PDOdb, &$db, &$user, &$conf, &$langs, $footer=1)
 
 }
 
+function _listAvoir(&$PDOdb, &$db, &$user, &$conf, &$langs, $footer=1)
+{
+	llxHeader('',$langs->trans('sendinvoicetoadherentTitleAvoir'),'','');
+	
+	print_fiche_titre($langs->trans("sendinvoicetoadherentTitleListAvoir"));
+
+	$TFetchError = $_SESSION['SENDTOINVOICETOADHERENT_TFETCHERROR'];
+	$TCreateError = $_SESSION['SENDTOINVOICETOADHERENT_TCREATEERROR'];
+	
+	unset($_SESSION['SENDTOINVOICETOADHERENT_TFETCHERROR']);
+	unset($_SESSION['SENDTOINVOICETOADHERENT_TCREATEERROR']);
+	
+	$sql = _getSql2();
+	
+  	$count = 0;
+	if ($PDOdb->Execute($sql))
+	{
+		$count = $PDOdb->Get_Recordcount();
+	}
+
+	echo '<div class="tabBar">';
+	echo '<table class="border" width="100%">';
+
+	echo '<tr><td width="20%">'.$langs->trans("sendinvoicetoadherentCountUnpaidInvoice").'</td><td width="80%">'.$count.'</td></tr>';
+
+	if ($count > 0)
+	{
+		echo '<tr><td width="20%">'.$langs->trans("sendinvoicetoadherentViewLinkID").'</td><td width="80%">';
+		$old_id = 0;
+		$TAdherent = array();
+		//var_dump($TAdherent);
+		while ($row = $PDOdb->Get_line())
+		{
+			if (isset($TAdherent[$row->rowid])) $TAdherent[$row->rowid][] = $row->facnumber;
+			else $TAdherent[$row->rowid] = array($row->facnumber);
+		}
+		
+		foreach ($TAdherent as $fk_adherent => $TFacnumber)
+		{
+			echo '<span><a target="_blank" href="'.dol_buildpath('/adherents/card.php?rowid='.$fk_adherent, 1).'">'.img_picto('', 'object_user').$fk_adherent.'&nbsp;</a>';
+			echo '[';
+			
+			$nbFac = count($TFacnumber);
+			$i = 0;
+			foreach ($TFacnumber as $facnumber)
+			{
+				$i++;
+				echo '<a href="'.dol_buildpath('/compta/facture.php?ref='.$facnumber, 2).'">';
+				if ($i > 1) echo '<span style="color:red;">';
+				echo $facnumber;
+				if ($i > 1) echo '</span>';
+				echo '</a>';
+				
+				if ($nbFac > 1 && $i < $nbFac) echo ' - ';
+			}
+			
+			echo ']</span>&nbsp;&nbsp;';
+		}
+
+		echo '</td><tr>';
+	}
+
+
+	// Affiche les erreurs à propos des fetch en échec
+	if ($TFetchError)
+	{
+		echo '<tr><td width="20%">'.$langs->trans("sendinvoicetoadherentViewListErrorFetchFac").'</td><td width="80%">';
+		foreach ($TFetchError as $facnumber)
+		{
+			 echo '<a target="_blank" style="float:left;" href="'.dol_buildpath('/compta/facture.php?ref='.$facnumber, 1).'">'.img_picto('', 'object_bill').$facnumber.'&nbsp;</a>';
+		}
+
+		echo '</td><tr>';
+	}
+
+	// Affiche les erreurs à propos des créations d'avoirs
+	if ($TCreateError)
+	{
+		echo '<tr><td width="20%">'.$langs->trans("sendinvoicetoadherentViewListErrorCreateAvoir").'</td><td width="80%">';
+		foreach ($TCreateError as $facnumber)
+		{
+			 echo '<a target="_blank" style="float:left;" href="'.dol_buildpath('/compta/facture.php?ref='.$facnumber, 1).'">'.img_picto('', 'object_bill').$facnumber.'&nbsp;</a>';
+		}
+
+		echo '</td><tr>';
+	}
+
+	echo '</table></div>';
+
+	if ($user->rights->sendinvoicetoadherent->create)
+	{
+		echo '<div class="tabsAction">';
+		echo '<a class="butAction" href="'.dol_buildpath('/sendinvoicetoadherent/sendinvoicetoadherent.php?action=createAvoir', 1).'">'.$langs->trans('sendinvoicetoadherentActionCreateAvoir').'</a>';
+		echo '</div>';
+	}
+
+	$PDOdb->close();
+	llxFooter('');
+}
+
 function _create(&$PDOdb, &$db, &$user, &$conf, &$langs, $df=false, $ds=false, $de=false, $amount=0, $label='')
 {
 	unset($_SESSION['SENDTOINVOICETOADHERENT_ERRORS']);
 	
-	_liste($PDOdb, $db, $user, $conf, $langs, 0);
+	_list($PDOdb, $db, $user, $conf, $langs, 0);
 
 	if(!$user->rights->sendinvoicetoadherent->create) accessforbidden();
 	else
@@ -414,27 +522,154 @@ function _sendByMail(&$db, &$conf, &$user, &$langs, &$facture, &$societe, $label
 	return $CMail->sendfile();
 }
 
-//La dernière facture doit contenir la ligne de facture "Cotisation anuelle ..."
+function _createAvoir(&$PDOdb, &$db, &$user, &$conf, &$langs)
+{
+	dol_include_once('/compta/facture/class/facture.class.php');
+	dol_include_once('/core/class/discount.class.php');
+	
+	$sql = _getSql2();
+	$PDOdb->Execute($sql);
+	$TFacnumberFetchError = array();
+	$TFacnumberCreateError = array();
+	$TDiscountCreateError = array();
+	$nbValidate = 0;
+	
+	while ($row = $PDOdb->Get_line()) 
+	{
+		$fk_soc = $row->fk_soc;
+		$facnumber = $row->facnumber;
+	
+		$factureImpayee = new Facture($db);
+		if ($factureImpayee->fetch(null, $facnumber) <= 0)
+		{
+			$TFacnumberFetchError[] = $facnumber;
+			continue;
+		}
+		
+		$dateinvoice = dol_mktime(12, 0, 0, date('m'), date('d'), date('Y'));
+		
+		$facture = new Facture($db);
+		
+		$facture->socid = $fk_soc;
+		$facture->fk_facture_source = $factureImpayee->id;
+		$facture->type = Facture::TYPE_CREDIT_NOTE;
+		$facture->date = $dateinvoice;
+		
+		if ($facture->create($user) <= 0) 
+		{
+			$TFacnumberCreateError[] = $facnumber;
+			continue;
+		}
+		
+		foreach($factureImpayee->lines as $line)
+        {
+            $line->fk_facture = $facture->id;
+
+            $line->subprice =-$line->subprice; // invert price for object
+            $line->pa_ht = -$line->pa_ht;
+            $line->total_ht=-$line->total_ht;
+            $line->total_tva=-$line->total_tva;
+            $line->total_ttc=-$line->total_ttc;
+            $line->total_localtax1=-$line->total_localtax1;
+            $line->total_localtax2=-$line->total_localtax2;
+
+            $line->insert();
+
+            $facture->lines[] = $line; // insert new line in current object
+        }
+
+        $facture->update_price(1);
+		$facture->validate($user);
+		
+		$discountcheck=new DiscountAbsolute($db);
+		$result=$discountcheck->fetch(0,$facture->id);
+
+
+		if (!empty($discountcheck->id))
+		{
+			//can't convert
+			$facture->delete();
+			continue;
+		}
+
+		$i = 0;
+		foreach ($facture->lines as $line) {
+			if($line->total_ht!=0) { // no need to create discount if amount is null
+				$amount_ht [$line->tva_tx] += $line->total_ht;
+				$amount_tva [$line->tva_tx] += $line->total_tva;
+				$amount_ttc [$line->tva_tx] += $line->total_ttc;
+				$i ++;
+			}
+		}
+
+		// Insert one discount by VAT rate category
+		$discount = new DiscountAbsolute($db);
+		$discount->description = '(CREDIT_NOTE)';
+		
+		$discount->tva_tx = abs($facture->total_ttc);
+		$discount->fk_soc = $facture->socid;
+		$discount->fk_facture_source = $facture->id;
+
+		foreach ($amount_ht as $tva_tx => $xxx) 
+		{
+			$discount->amount_ht = abs($amount_ht [$tva_tx]);
+			$discount->amount_tva = abs($amount_tva [$tva_tx]);
+			$discount->amount_ttc = abs($amount_ttc [$tva_tx]);
+			$discount->tva_tx = abs($tva_tx);
+
+			$result = $discount->create($user);
+			if ($result < 0)
+			{
+				$TDiscountCreateError[] = $facnumber;
+				$error++;
+				break;
+			}
+
+			$result = $facture->set_paid($user);
+			$result = $discount->link_to_invoice(0, $factureImpayee->id);
+			
+			$r = $factureImpayee->set_paid($user);
+		}
+
+
+/******/
+
+		$nbValidate++;
+	}
+
+	if ($nbValidate) setEventMessages($langs->trans('sendinvoicetoadherentAvoirValidate', $nbValidate), null);
+	if (count($TFacnumberFetchError) > 0) setEventMessages($langs->trans('sendinvoicetoadherentErrorFetchFacture', count($TFacnumberFetchError)), null, 'errors');
+	if (count($TFacnumberCreateError) > 0) setEventMessages($langs->trans('sendinvoicetoadherentErrorCreateAvoir', count($TFacnumberCreateError)), null, 'errors');
+	
+	$_SESSION['SENDTOINVOICETOADHERENT_TFETCHERROR'] = $TFacnumberFetchError;
+	$_SESSION['SENDTOINVOICETOADHERENT_TCREATEERROR'] = $TFacnumberCreateError;
+	
+	header('Location: '.dol_buildpath('/sendinvoicetoadherent/sendinvoicetoadherent.php?action=listAvoir', 2));
+	exit;
+}
+
 function _getSql()
 {
 	global $conf;
 	
-	$fk_product_cotisation = $conf->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS;
+	$fk_product_cotisation = (int) $conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS;
 	
 	return "
 		SELECT a.rowid 
 		FROM ".MAIN_DB_PREFIX."adherent a 
 		WHERE a.entity = 1 
-		#AND a.statut <> -1 # Pas d'adhérent en brouillon
+		AND a.statut <> -1 # Pas d'adhérent en brouillon
+		AND a.rowid = 1391
 		AND a.rowid NOT IN (SELECT cc.fk_adherent FROM llx_cotisation cc WHERE CURRENT_DATE BETWEEN cc.dateadh AND cc.datef) # n'est pas dans la liste des adhérents ayant une cotisation pour l'année en cours
 		AND a.rowid NOT IN ( # n'est pas dans la liste des adhérents ayant une ou +sieurs facture (je prend la plus récente) dont la date est de moins d'un an (cotisation à l'année)
 		    SELECT aa.rowid     
 		    FROM ".MAIN_DB_PREFIX."adherent aa 
 		    INNER JOIN ".MAIN_DB_PREFIX."facture f ON (f.fk_soc = aa.fk_soc AND f.entity = 1 AND f.fk_statut = 1)		    
-		    WHERE f.rowid IN (SELECT fd.fk_facture FROM llx_facturedet fd WHERE fk_product = ".$fk_product_cotisation.")
+		    WHERE f.rowid IN (SELECT fd.fk_facture FROM ".MAIN_DB_PREFIX."facturedet fd WHERE fk_product = ".$fk_product_cotisation.")
 		    AND f.datef = ( # filtre pour récupérer la facture la plus récente
 				SELECT MAX(ff.datef) 
                 FROM ".MAIN_DB_PREFIX."facture ff 
+                INNER JOIN ".MAIN_DB_PREFIX."facturedet ffd ON (ffd.fk_facture = ff.rowid AND ffd.fk_product = ".$fk_product_cotisation.")
                 WHERE ff.fk_soc = f.fk_soc
 		    )
 		    AND f.datef > (CURDATE() - INTERVAL 1 YEAR)
@@ -442,4 +677,29 @@ function _getSql()
 	";
 }
 
-//Fonction d'avoir automatique pour les factures non payé avec la ligne de "Cotisation anuelle ..." (affichage du Tiers/adhérent + num facture ~ montant)
+function _getSql2()
+{
+	global $conf;
+	
+	$fk_product_cotisation = (int) $conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS;
+	
+	//Attention la requete peut renvoyer plusieurs fois le même id adhérent (s'il a +sieurs datef identique au max)
+	return "
+		SELECT a.rowid, a.fk_soc, f.facnumber #Je veux la liste des adhérents avec leur facture impayée 
+
+		FROM llx_adherent a 
+		INNER JOIN llx_societe s ON (s.rowid = a.fk_soc) 
+		INNER JOIN llx_facture f ON (f.fk_soc = s.rowid) 
+		WHERE a.entity = 1
+		AND f.datef = ( # filtre pour récupérer la facture la plus récente 
+		    SELECT MAX(ff.datef) 
+		    FROM llx_facture ff 
+		    INNER JOIN llx_facturedet ffd ON (ffd.fk_facture = ff.rowid AND ffd.fk_product = 1) 
+		    WHERE ff.fk_soc = f.fk_soc 
+		    AND ff.type = 0
+		    AND ff.fk_statut IN (0, 1)
+		    AND ff.datef > (CURDATE() - INTERVAL 1 YEAR)
+		    AND ff.rowid NOT IN (SELECT fff.fk_facture_source FROM llx_facture fff WHERE type = 2)
+		)
+	";
+}

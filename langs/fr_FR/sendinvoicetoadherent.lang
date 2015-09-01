@@ -12,11 +12,15 @@ SENDINVOICETOADHERENT_SUBJECT_HELP=Des valeurs de remplacements sont disponible 
 sendinvoicetoadherent_message=Core du mail
 
 sendinvoicetoadherentTitle=Facturer cotisations
+sendinvoicetoadherentTitleAvoir=Générer avoirs
 sendinvoicetoadherentTitleList=Cotisations non réglés
+sendinvoicetoadherentTitleListAvoir=Création d'avoirs pour les factures de cotisation non réglés
 sendinvoicetoadherentTitleCreate=Création facture et envoi par email
 sendinvoicetoadherentLeftMenuTitle=Facturer cotisations
 sendinvoicetoadherentLeftMenuTitleList=Liste des adhérents
+sendinvoicetoadherentLeftMenuTitleListAvoir=Générer des avoirs
 sendinvoicetoadherentCount=Nombre d'adhérent à facturer
+sendinvoicetoadherentCountUnpaidInvoice=Nombre de facture impayée
 sendinvoicetoadherentViewLinkID=Liste des adhérents concernés
 sendinvoicetoadherentErrorCreateNotPermitted=Erreur : vous n'avez pas le droit nécéssaire pour poursuivre le cette action
 sendinvoicetoadherentErrorDateFac=Erreur : date facture invalide
@@ -28,11 +32,17 @@ sendinvoicetoadherentViewListErrorCreateTiers=Liste des adhérents dont la créa
 sendinvoicetoadherentViewListErrorCreateFacture=Liste des tiers dont la création d'une facture a échoué
 sendinvoicetoadherentViewListErrorMailSend=Liste des tiers dont l'envoi de mail a échoué
 sendinvoicetoadherentConfirmCreate=Création de %s facture(s)
+sendinvoicetoadherentErrorFetchFacture=Erreur : %s facture(s) non lisible
+sendinvoicetoadherentErrorCreateAvoir=Erreur : %s avoir(s) non créé(s)
+sendinvoicetoadherentViewListErrorFetchFac=Liste des factures non lisible
+sendinvoicetoadherentViewListErrorCreateAvoir=Liste des factures dont la création d'un avoir a échoué
 
+sendinvoicetoadherentAvoirValidate=%s avoir(s) créé(s)
 sendinvoicetoadherentRightRead=Consulter la liste
 sendinvoicetoadherentRightCreate=Créer/envoyer les factures
 
 sendinvoicetoadherentActionCreate=Créer/envoyer factures
+sendinvoicetoadherentActionCreateAvoir=Créer les avoirs
 sendinvoicetoadherentActionCreateConfirm=Valider
 sendinvoicetoadherentDateFacture=Date facturation
 sendinvoicetoadherentCreateCotisation=Créer les cotisations

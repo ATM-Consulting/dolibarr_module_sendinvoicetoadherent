@@ -220,6 +220,20 @@ class modsendinvoicetoadherent extends DolibarrModules
 								'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
 		$r++;
 		
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=members,fk_leftmenu=sendinvoicetoadherent',			                // Put 0 if this is a top menu
+								'type'=>'left',			                // This is a Top menu entry
+								'titre'=>$langs->trans('sendinvoicetoadherentLeftMenuTitleListAvoir'),
+								'mainmenu'=>'sendinvoicetoadherent',
+								'leftmenu'=>'sendinvoicetoadherentlist',
+								'url'=>'/sendinvoicetoadherent/sendinvoicetoadherent.php?action=listAvoir',
+								'langs'=>'sendinvoicetoadherent@sendinvoicetoadherent',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+								'position'=>101,
+								'enabled'=>'$conf->sendinvoicetoadherent->enabled',	// Define condition to show or hide menu entry. Use '$conf->sendinvoicetoadherent->enabled' if entry must be visible if module is enabled.
+								'perms'=>'$user->rights->sendinvoicetoadherent->read',			                // Use 'perms'=>'$user->rights->sendinvoicetoadherent->level1->level2' if you want your menu with a permission rules
+								'target'=>'',
+								'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
+		$r++;
+		
 		
 		// Add here entries to declare new menus
 		//
