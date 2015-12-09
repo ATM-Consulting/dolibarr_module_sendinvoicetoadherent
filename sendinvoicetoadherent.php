@@ -593,6 +593,7 @@ function _createAvoir(&$PDOdb, &$db, &$user, &$conf, &$langs)
 		}
 
 		$i = 0;
+		$amount_ht = $amount_tva = $amount_ttc = array();
 		foreach ($facture->lines as $line) {
 			if($line->total_ht!=0) { // no need to create discount if amount is null
 				$amount_ht [$line->tva_tx] += $line->total_ht;
