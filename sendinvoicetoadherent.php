@@ -660,7 +660,6 @@ function _getSql()
 		FROM ".MAIN_DB_PREFIX."adherent a 
 		WHERE a.entity = 1 
 		AND a.statut <> -1 # Pas d'adhérent en brouillon
-		AND a.rowid = 1391
 		AND a.rowid NOT IN (SELECT cc.fk_adherent FROM llx_cotisation cc WHERE CURRENT_DATE BETWEEN cc.dateadh AND cc.datef) # n'est pas dans la liste des adhérents ayant une cotisation pour l'année en cours
 		AND a.rowid NOT IN ( # n'est pas dans la liste des adhérents ayant une ou +sieurs facture (je prend la plus récente) dont la date est de moins d'un an (cotisation à l'année)
 		    SELECT aa.rowid     
