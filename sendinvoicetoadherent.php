@@ -664,7 +664,7 @@ function _getSql()
 		AND a.rowid NOT IN ( # n'est pas dans la liste des adhérents ayant une ou +sieurs facture (je prend la plus récente) dont la date est de moins d'un an (cotisation à l'année)
 		    SELECT aa.rowid     
 		    FROM ".MAIN_DB_PREFIX."adherent aa 
-		    INNER JOIN ".MAIN_DB_PREFIX."facture f ON (f.fk_soc = aa.fk_soc AND f.entity = 1 AND f.fk_statut = 1)		    
+		    INNER JOIN ".MAIN_DB_PREFIX."facture f ON (f.fk_soc = aa.fk_soc AND f.entity = 1 AND f.fk_statut >= 1)		    
 		    WHERE f.rowid IN (SELECT fd.fk_facture FROM ".MAIN_DB_PREFIX."facturedet fd WHERE fk_product = ".$fk_product_cotisation.")
 		    AND f.datef = ( # filtre pour récupérer la facture la plus récente
 				SELECT MAX(ff.datef) 
@@ -672,7 +672,7 @@ function _getSql()
                 INNER JOIN ".MAIN_DB_PREFIX."facturedet ffd ON (ffd.fk_facture = ff.rowid AND ffd.fk_product = ".$fk_product_cotisation.")
                 WHERE ff.fk_soc = f.fk_soc
 		    )
-		    AND f.datef > (CURDATE() - INTERVAL 1 YEAR)
+		    AND YEAR(f.datef) > YEAR(CURDATE()) - 1
 		)
 	";
 }
