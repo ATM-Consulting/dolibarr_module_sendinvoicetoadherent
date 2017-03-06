@@ -3,6 +3,7 @@
 require('config.php');
 require('./class/sendinvoicetoadherent.class.php');
 require('./lib/sendinvoicetoadherent.lib.php');
+dol_include_once('/societe/class/societe.class.php');
 
 if(!$user->rights->sendinvoicetoadherent->read) accessforbidden();
 
@@ -71,10 +72,13 @@ function _list(&$PDOdb, &$db, &$user, &$conf, &$langs, $footer=1)
 
 	if ($count > 0)
 	{
+		$societe = new Societe($db);
 		echo '<tr><td width="20%">'.$langs->trans("sendinvoicetoadherentViewLinkID").'</td><td width="80%">';
 		while ($row = $PDOdb->Get_line())
 		{
-			 echo '<a target="_blank" style="float:left;" href="'.dol_buildpath('/adherents/card.php?rowid='.$row->rowid, 1).'">'.img_picto('', 'object_user').$row->rowid.'&nbsp;</a>';
+			$societe->fetch($row->socid);
+			//echo '<a target="_blank" style="float:left;" href="'.dol_buildpath('/adherents/card.php?rowid='.$row->rowid, 1).'">'.img_picto('', 'object_user').$row->rowid.'&nbsp;</a>';
+			echo $societe->getNomUrl(1).'<br>';
 		}
 
 		echo '</td><tr>';
@@ -401,10 +405,10 @@ function _create_and_send($PDOdb, $db, $user, $conf, $langs)
 					if ($facture->create($user) > 0) 
 					{
 						 $facture->validate($user);
-						 if (!_sendByMail($db, $conf, $user, $langs, $facture, $societe, $label))
+						 /*if (!_sendByMail($db, $conf, $user, $langs, $facture, $societe, $label))
 						 {
 						 	$TErrorMail[] = $societe->id;
-						 }
+						 }*/
 					}
 					else $TErrorFac[] = $societe->id;
 
@@ -656,8 +660,9 @@ function _getSql()
 	$fk_product_cotisation = (int) $conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS;
 	
 	return "
-		SELECT a.rowid 
-		FROM ".MAIN_DB_PREFIX."adherent a 
+		SELECT a.rowid, s.rowid as socid
+		FROM ".MAIN_DB_PREFIX."adherent a
+		LEFT JOIN ".MAIN_DB_PREFIX."societe as s ON (s.rowid = a.fk_soc) 
 		WHERE a.entity = 1 
 		AND a.statut <> -1 # Pas d'adhérent en brouillon
 		AND a.rowid NOT IN (SELECT cc.fk_adherent FROM llx_cotisation cc WHERE CURRENT_DATE BETWEEN cc.dateadh AND cc.datef) # n'est pas dans la liste des adhérents ayant une cotisation pour l'année en cours

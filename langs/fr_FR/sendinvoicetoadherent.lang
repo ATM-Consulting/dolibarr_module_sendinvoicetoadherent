@@ -41,7 +41,7 @@ sendinvoicetoadherentAvoirValidate=%s avoir(s) créé(s)
 sendinvoicetoadherentRightRead=Consulter la liste
 sendinvoicetoadherentRightCreate=Créer/envoyer les factures
 
-sendinvoicetoadherentActionCreate=Créer/envoyer factures
+sendinvoicetoadherentActionCreate=Créer les factures
 sendinvoicetoadherentActionCreateAvoir=Créer les avoirs
 sendinvoicetoadherentActionCreateConfirm=Valider
 sendinvoicetoadherentDateFacture=Date facturation
