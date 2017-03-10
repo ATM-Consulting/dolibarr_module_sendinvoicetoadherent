@@ -703,7 +703,7 @@ function _getSql2()
 		    WHERE ff.fk_soc = f.fk_soc 
 		    AND ff.type = 0
 		    AND ff.fk_statut IN (0, 1)
-		    AND ff.datef > (CURDATE() - INTERVAL 1 YEAR)
+		    # AND ff.datef > (CURDATE() - INTERVAL 1 YEAR)
 		    AND ff.rowid NOT IN (SELECT fff.fk_facture_source FROM llx_facture fff WHERE type = 2)
 		)
 	";
