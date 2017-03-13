@@ -671,6 +671,7 @@ function _getSql()
 		    FROM ".MAIN_DB_PREFIX."adherent aa 
 		    INNER JOIN ".MAIN_DB_PREFIX."facture f ON (f.fk_soc = aa.fk_soc AND f.entity = 1 AND f.fk_statut >= 1)		    
 		    WHERE f.rowid IN (SELECT fd.fk_facture FROM ".MAIN_DB_PREFIX."facturedet fd WHERE fk_product = ".$fk_product_cotisation.")
+		    AND f.type = 0
 		    AND f.datef = ( # filtre pour récupérer la facture la plus récente
 				SELECT MAX(ff.datef) 
                 FROM ".MAIN_DB_PREFIX."facture ff 
