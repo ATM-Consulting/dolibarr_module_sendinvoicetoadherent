@@ -209,8 +209,8 @@ class modsendinvoicetoadherent extends DolibarrModules
 		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=accountancy,fk_leftmenu=sendinvoicetoadherent',			                // Put 0 if this is a top menu
 								'type'=>'left',			                // This is a Top menu entry
 								'titre'=>$langs->trans('sendinvoicetoadherentLeftMenuTitleList'),
-								'mainmenu'=>'sendinvoicetoadherent',
-								'leftmenu'=>'sendinvoicetoadherentlist',
+								'mainmenu'=>'accountancy',
+								'leftmenu'=>'sendinvoicetoadherent',
 								'url'=>'/sendinvoicetoadherent/sendinvoicetoadherent.php?action=list',
 								'langs'=>'sendinvoicetoadherent@sendinvoicetoadherent',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 								'position'=>101,
@@ -223,8 +223,8 @@ class modsendinvoicetoadherent extends DolibarrModules
 		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=accountancy,fk_leftmenu=sendinvoicetoadherent',			                // Put 0 if this is a top menu
 								'type'=>'left',			                // This is a Top menu entry
 								'titre'=>$langs->trans('sendinvoicetoadherentLeftMenuTitleListAvoir'),
-								'mainmenu'=>'sendinvoicetoadherent',
-								'leftmenu'=>'sendinvoicetoadherentlist',
+								'mainmenu'=>'accountancy',
+								'leftmenu'=>'sendinvoicetoadherent',
 								'url'=>'/sendinvoicetoadherent/sendinvoicetoadherent.php?action=listAvoir',
 								'langs'=>'sendinvoicetoadherent@sendinvoicetoadherent',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
 								'position'=>101,
