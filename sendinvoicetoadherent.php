@@ -122,7 +122,7 @@ function _list(&$PDOdb, &$db, &$user, &$conf, &$langs, $footer=1)
 
 	echo '</table></div>';
 
-	if ($user->rights->sendinvoicetoadherent->create)
+	if ($user->rights->sendinvoicetoadherent->create && $count > 0)
 	{
 		echo '<div class="tabsAction">';
 		echo '<a class="butAction" href="'.dol_buildpath('/sendinvoicetoadherent/sendinvoicetoadherent.php?action=create', 1).'">'.$langs->trans('sendinvoicetoadherentActionCreate').'</a>';
@@ -302,11 +302,8 @@ function _create_and_send($PDOdb, $db, $user, $conf, $langs)
 	dol_include_once('/core/lib/files.lib.php');
 
 	$date_fac = GETPOST('date_fac', 'alpha');
-	$create_cotisation = GETPOST('create_cotisation', 'int');
-	$date_start = GETPOST('date_start', 'alpha');
-	$date_end = GETPOST('date_end', 'alpha');
-	$amount = price2num(GETPOST('amount_cotisation', 'alpha'), 2);
-	$label = GETPOST('label', 'alpha');
+	$date_start = strtotime('first day of april');
+	$date_end = strtotime('+1year -1day', $date_start);
 	
 	$TDate_fac = explode('/' , $date_fac);
 	if (!checkdate($TDate_fac[1], $TDate_fac[0], $TDate_fac[2]))
@@ -315,24 +312,12 @@ function _create_and_send($PDOdb, $db, $user, $conf, $langs)
 		setEventMessages($langs->trans('sendinvoicetoadherentErrorDateFac'), false, 'errors');
 	}
 	
-	if ($create_cotisation)
-	{
-		$TDate_start = explode('/', $date_start);
-		$TDate_end = explode('/', $date_end);
-		if (!checkdate($TDate_start[1], $TDate_start[0], $TDate_start[2]) || !checkdate($TDate_end[1], $TDate_end[0], $TDate_end[2]))
-		{
-			$error++;
-			setEventMessages($langs->trans('sendinvoicetoadherentErrorDate'), false, 'errors');
-		}	
-	}
+	$product = new Product($db);
+	$product->fetch(0,'ADI');
+	$TProductTypo['Interne'] = $product;
+	$product->fetch(0,'ADE');
+	$TProductTypo['Externe'] = $product;
 	
-	$fk_facture_rec = (int) $conf->global->SENDINVOICETOADHERENT_FK_FACTURE;
-	if (!$fk_facture_rec)
-	{
-		$error++;
-		setEventMessages($langs->trans('sendinvoicetoadherent_fk_facture'), false, 'errors');
-	}
-
 	if (!$error)
 	{
 		$sql = _getSql();
@@ -342,58 +327,33 @@ function _create_and_send($PDOdb, $db, $user, $conf, $langs)
 			$TError = $TErrorFac = $TErrorMail = array();
 			while ($row = $PDOdb->Get_line())
 			{
-				$ad = new Adherent($db);
-				$ad->fetch($row->rowid);
-
-				if (!$ad->fk_soc && $ad->societe) $societe = _createTiers($db, $user, $ad);
-				else
+				$societe = new Societe($db);
+				$res = $societe->fetch($row->rowid);
+				
+				if ($res == 1)
 				{
-					$ad->fetch_thirdparty();
-					$societe = $ad->thirdparty;
-				}
-	
-				if ($societe && $societe->id > 0)
-				{
-					if ($create_cotisation)
-					{
-				        if ($ad->cotisation(dol_mktime(0, 0, 0, $TDate_start[1], $TDate_start[0], $TDate_start[2]), $amount, 0, '', $label, '', '', '', dol_mktime(0, 0, 0, $TDate_end[1], $TDate_end[0], $TDate_end[2])) <= 0)
-				        {
-				            $error++;
-					        setEventMessages($object->error,$object->errors, 'errors');
-				        }
-					}
+					$typo = $societe->array_options['options_tyopologie'];
+					$prod = $TProductTypo[$typo];
 					
-					$factureRec = new FactureRec($db);
-					$factureRec->fetch($fk_facture_rec);
-
 					$facture = new Facture($db);
 					$facture->brouillon = 1;
 					$facture->socid = $societe->id;
 					$facture->type = Facture::TYPE_STANDARD;
-					$facture->fk_project        = $factureRec->fk_project;
-					$facture->cond_reglement_id = $factureRec->cond_reglement_id;
-					$facture->mode_reglement_id = $factureRec->mode_reglement_id;
-					$facture->remise_absolue    = $factureRec->remise_absolue;
-					$facture->remise_percent    = $factureRec->remise_percent;
+					$facture->cond_reglement_id = 0;
+					$facture->mode_reglement_id = 0;
 					$facture->date = dol_mktime(12, 0, 0, $TDate_fac[1], $TDate_fac[0], $TDate_fac[2]);
-					$facture->note_private = $factureRec->note_private;
-					$facture->note_public = $factureRec->note_public;
-					$facture->lines = $factureRec->lines;
 					
 					if ($facture->create($user) > 0) 
 					{
-						 $facture->validate($user);
-						 /*if (!_sendByMail($db, $conf, $user, $langs, $facture, $societe, $label))
-						 {
-						 	$TErrorMail[] = $societe->id;
-						 }*/
+						$facture->addline('', $prod->price, 1, $prod->tva_tx,0,0,$prod->id,0,$date_start,$date_end);
+						$facture->validate($user);
 					}
 					else $TErrorFac[] = $societe->id;
 
 				}
 				else
 				{
-					$TError[] = $ad->id;
+					$TError[] = $societe->id;
 				}
 	
 			}
@@ -637,7 +597,8 @@ function _getSql()
 	$sql = 'SELECT s.rowid ';
 	$sql.= 'FROM '.MAIN_DB_PREFIX.'societe s ';
 	$sql.= 'LEFT JOIN '.MAIN_DB_PREFIX.'societe_extrafields sext ON (sext.fk_object = s.rowid) ';
-	$sql.= 'WHERE s.rowid NOT IN ( '; // N' pas encore eu de facture d'adhésion (service ADI ou ADE) sur l'année en cours
+	$sql.= 'WHERE sext.typologie IN (\'Interne\',\'Externe\')';
+	$sql.= 'AND s.rowid NOT IN ( '; // N' pas encore eu de facture d'adhésion (service ADI ou ADE) sur l'année en cours
 	$sql.= '	SELECT f.fk_soc ';
 	$sql.= '	FROM '.MAIN_DB_PREFIX.'facture f ';
 	$sql.= '	LEFT JOIN '.MAIN_DB_PREFIX.'facturedet fdet ON (fdet.fk_facture = f.rowid) ';
