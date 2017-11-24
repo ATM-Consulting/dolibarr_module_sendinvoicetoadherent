@@ -597,13 +597,13 @@ function _getSql()
 	$sql = 'SELECT s.rowid ';
 	$sql.= 'FROM '.MAIN_DB_PREFIX.'societe s ';
 	$sql.= 'LEFT JOIN '.MAIN_DB_PREFIX.'societe_extrafields sext ON (sext.fk_object = s.rowid) ';
-	$sql.= 'WHERE sext.typologie IN (\'Interne\',\'Externe\')';
+	$sql.= 'WHERE sext.typologie IN (\'INT\',\'EXT\')';
 	$sql.= 'AND s.rowid NOT IN ( '; // N' pas encore eu de facture d'adhésion (service ADI ou ADE) sur l'année en cours
 	$sql.= '	SELECT f.fk_soc ';
 	$sql.= '	FROM '.MAIN_DB_PREFIX.'facture f ';
 	$sql.= '	LEFT JOIN '.MAIN_DB_PREFIX.'facturedet fdet ON (fdet.fk_facture = f.rowid) ';
 	$sql.= '	LEFT JOIN '.MAIN_DB_PREFIX.'product p ON (fdet.fk_product = p.rowid) ';
-	$sql.= '	WHERE (p.ref IN (\'INT\',\'EXT\') ';
+	$sql.= '	WHERE (p.ref IN (\'ADI\',\'ADE\') ';
 	$sql.= '	OR fdet.description LIKE \'%Adhésion%\') ';
 	$sql.= '	AND YEAR(f.datef) = YEAR(CURDATE()) ';
 	$sql.= ')';
