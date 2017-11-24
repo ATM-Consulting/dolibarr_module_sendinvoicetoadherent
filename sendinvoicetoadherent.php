@@ -348,6 +348,7 @@ function _create_and_send($PDOdb, $db, $user, $conf, $langs)
 					{
 						$facture->addline('', $prod->price, 1, $prod->tva_tx,0,0,$prod->id,0,$date_start,$date_end);
 						$facture->validate($user);
+						$facture->generateDocument($facture->modelpdf, $langs);
 					}
 					else $TErrorFac[] = $societe->id;
 
