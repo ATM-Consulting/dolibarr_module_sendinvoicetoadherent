@@ -333,14 +333,14 @@ function _create_and_send($PDOdb, $db, $user, $conf, $langs)
 				
 				if ($res == 1)
 				{
-					$typo = $societe->array_options['options_tyopologie'];
+					$typo = $societe->array_options['options_typologie'];
 					$prod = $TProductTypo[$typo];
 					
 					$facture = new Facture($db);
 					$facture->brouillon = 1;
 					$facture->socid = $societe->id;
 					$facture->type = Facture::TYPE_STANDARD;
-					$facture->cond_reglement_id = 0;
+					$facture->cond_reglement_id = 1;
 					$facture->mode_reglement_id = 0;
 					$facture->date = dol_mktime(12, 0, 0, $TDate_fac[1], $TDate_fac[0], $TDate_fac[2]);
 					
