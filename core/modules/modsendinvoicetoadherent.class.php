@@ -195,7 +195,7 @@ class modsendinvoicetoadherent extends DolibarrModules
 		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=accountancy',			                // Put 0 if this is a top menu
 								'type'=>'left',			                // This is a Top menu entry
 								'titre'=>$langs->trans('sendinvoicetoadherentLeftMenuTitle'),
-								'mainmenu'=>'members',
+								'mainmenu'=>'accountancy',
 								'leftmenu'=>'sendinvoicetoadherent',
 								'url'=>'/sendinvoicetoadherent/sendinvoicetoadherent.php',
 								'langs'=>'sendinvoicetoadherent@sendinvoicetoadherent',	        // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
