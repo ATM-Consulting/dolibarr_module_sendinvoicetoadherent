@@ -249,19 +249,6 @@ function _create(&$PDOdb, &$db, &$user, &$conf, &$langs, $df=false, $ds=false, $
 		$form=new TFormCore;
 		
 		print_fiche_titre($langs->trans("sendinvoicetoadherentTitleCreate"));
-		echo '<script type="text/javascript">
-			$(function() {
-				displayDateCotisation();
-			});
-			
-			function displayDateCotisation(obj) {
-				if ($(obj).attr("checked") == "checked") {
-					$(".cotisation_create").show()
-				} else {
-					$(".cotisation_create").hide()
-				}
-			}
-		</script>';
 		
 		echo '<form style="padding-top:15px;" name="formsoc" action="'.$_SERVER["PHP_SELF"].'" method="post" enctype="multipart/form-data">';
 		echo '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
@@ -275,22 +262,13 @@ function _create(&$PDOdb, &$db, &$user, &$conf, &$langs, $df=false, $ds=false, $
 		$label = empty($label) ? $langs->trans("Subscription").' '.($ds ? substr($date_start, -4, 4) : dol_print_date(time(),'%Y')) : $label;
 		
 		echo '<tr><td width="20%" class="fieldrequired">'.$langs->trans("sendinvoicetoadherentDateFacture").'</td><td width="80%">'.$form->calendrier('', 'date_fac', $date_fac).'</td></tr>';
-		
-		echo '<tr><td width="20%">'.$langs->trans("sendinvoicetoadherentCreateCotisation").'</td><td width="80%"><input type="checkbox" name="create_cotisation" value="1" onclick="javascript:displayDateCotisation(this);" /></td></tr>';
-		echo '<tr class="cotisation_create" style="display:none;"><td width="20%" class="fieldrequired">'.$langs->trans("sendinvoicetoadherentDateStartAdhesion").'</td><td width="80%">'.$form->calendrier('', 'date_start', $date_start).'</td></tr>';
-		echo '<tr class="cotisation_create" style="display:none;"><td width="20%">'.$langs->trans("sendinvoicetoadherentDateEndAdhesion").'</td><td width="80%">'.$form->calendrier('', 'date_end', $date_end).'</td></tr>';
-		echo '<tr class="cotisation_create" style="display:none;"><td width="20%" class="fieldrequired">'.$langs->trans("sendinvoicetoadherentAmountAdhesion").'</td><td width="80%">'.$form->texte('', 'amount_cotisation', $amount, 6, 15).' '.$langs->trans("Currency".$conf->currency).'</td></tr>';
-		echo '<tr class="cotisation_create" style="display:none;"><td width="20%">'.$langs->trans("sendinvoicetoadherentLabelAdhesion").'</td><td width="80%">'.$form->texte('', 'label', $label, 32, 255).'</td></tr>';
 
 		echo '</table>';
-
-		if ($user->rights->sendinvoicetoadherent->create)
-		{
-			echo '<br /><center>';
-			echo '<input type="submit" class="button" value="'.$langs->trans('sendinvoicetoadherentActionCreateConfirm').'" />&nbsp;&nbsp;&nbsp;&nbsp;';
-			echo '<a href="'.dol_buildpath('/sendinvoicetoadherent/sendinvoicetoadherent.php?action=list',2).'" class="button" style="text-decoration:none;font-weight:normal;cusor:pointer;height:15px;padding-top:5px;">'.$langs->trans('Cancel').'</a>';
-			echo '</center>';
-		}
+		
+		echo '<br /><center>';
+		echo '<input type="submit" class="button" value="'.$langs->trans('sendinvoicetoadherentActionCreateConfirm').'" />&nbsp;&nbsp;&nbsp;&nbsp;';
+		echo '<a href="'.dol_buildpath('/sendinvoicetoadherent/sendinvoicetoadherent.php?action=list',2).'" class="button" style="text-decoration:none;font-weight:normal;cusor:pointer;height:15px;padding-top:5px;">'.$langs->trans('Cancel').'</a>';
+		echo '</center>';
 
 		echo '</form>';
 	}
