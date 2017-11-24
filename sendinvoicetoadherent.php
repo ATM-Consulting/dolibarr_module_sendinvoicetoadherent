@@ -76,7 +76,7 @@ function _list(&$PDOdb, &$db, &$user, &$conf, &$langs, $footer=1)
 		echo '<tr><td width="20%">'.$langs->trans("sendinvoicetoadherentViewLinkID").'</td><td width="80%">';
 		while ($row = $PDOdb->Get_line())
 		{
-			$societe->fetch($row->socid);
+			$societe->fetch($row->rowid);
 			//echo '<a target="_blank" style="float:left;" href="'.dol_buildpath('/adherents/card.php?rowid='.$row->rowid, 1).'">'.img_picto('', 'object_user').$row->rowid.'&nbsp;</a>';
 			echo $societe->getNomUrl(1).'<br>';
 		}
@@ -655,32 +655,21 @@ function _createAvoir(&$PDOdb, &$db, &$user, &$conf, &$langs)
 
 function _getSql()
 {
-	global $conf;
+	// On récupère tous les tiers pour lesquels ils faut facturer l'adhésion pour l'année en cours
+	$sql = 'SELECT s.rowid ';
+	$sql.= 'FROM '.MAIN_DB_PREFIX.'societe s ';
+	$sql.= 'LEFT JOIN '.MAIN_DB_PREFIX.'societe_extrafields sext ON (sext.fk_object = s.rowid) ';
+	$sql.= 'WHERE s.rowid NOT IN ( '; // N' pas encore eu de facture d'adhésion (service ADI ou ADE) sur l'année en cours
+	$sql = '	SELECT f.fk_soc ';
+	$sql.= '	FROM '.MAIN_DB_PREFIX.'facture f ';
+	$sql.= '	LEFT JOIN '.MAIN_DB_PREFIX.'facturedet fdet ON (fdet.fk_facture = f.rowid) ';
+	$sql.= '	LEFT JOIN '.MAIN_DB_PREFIX.'product p ON (fdet.fk_product = p.rowid) ';
+	$sql.= '	WHERE (p.ref IN (\'ADI\',\'ADE\') ';
+	$sql.= '	OR fdet.description LIKE \'%Adhésion%\') ';
+	$sql.= '	AND YEAR(f.datef) = YEAR(CURDATE()) ';
+	$sql.= ')';
 	
-	$fk_product_cotisation = (int) $conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS;
-	
-	return "
-		SELECT a.rowid, s.rowid as socid
-		FROM ".MAIN_DB_PREFIX."adherent a
-		LEFT JOIN ".MAIN_DB_PREFIX."societe as s ON (s.rowid = a.fk_soc) 
-		WHERE a.entity = 1 
-		AND a.statut <> -1 # Pas d'adhérent en brouillon
-		AND a.rowid NOT IN (SELECT cc.fk_adherent FROM llx_cotisation cc WHERE YEAR(CURRENT_DATE) <= YEAR(cc.dateadh)) # n'est pas dans la liste des adhérents ayant une cotisation pour l'année en cours
-		AND a.rowid NOT IN ( # n'est pas dans la liste des adhérents ayant une ou +sieurs facture (je prend la plus récente) dont la date est de moins d'un an (cotisation à l'année)
-		    SELECT aa.rowid     
-		    FROM ".MAIN_DB_PREFIX."adherent aa 
-		    INNER JOIN ".MAIN_DB_PREFIX."facture f ON (f.fk_soc = aa.fk_soc AND f.entity = 1 AND f.fk_statut >= 1)		    
-		    WHERE f.rowid IN (SELECT fd.fk_facture FROM ".MAIN_DB_PREFIX."facturedet fd WHERE fk_product = ".$fk_product_cotisation.")
-		    AND f.type = 0
-		    AND f.datef = ( # filtre pour récupérer la facture la plus récente
-				SELECT MAX(ff.datef) 
-                FROM ".MAIN_DB_PREFIX."facture ff 
-                INNER JOIN ".MAIN_DB_PREFIX."facturedet ffd ON (ffd.fk_facture = ff.rowid AND ffd.fk_product = ".$fk_product_cotisation.")
-                WHERE ff.fk_soc = f.fk_soc
-		    )
-		    AND YEAR(f.datef) > YEAR(CURDATE()) - 1
-		)
-	";
+	return $sql;
 }
 
 function _getSql2()
