@@ -603,7 +603,7 @@ function _getSql()
 	$sql.= '	FROM '.MAIN_DB_PREFIX.'facture f ';
 	$sql.= '	LEFT JOIN '.MAIN_DB_PREFIX.'facturedet fdet ON (fdet.fk_facture = f.rowid) ';
 	$sql.= '	LEFT JOIN '.MAIN_DB_PREFIX.'product p ON (fdet.fk_product = p.rowid) ';
-	$sql.= '	WHERE (p.ref IN (\'ADI\',\'ADE\') ';
+	$sql.= '	WHERE (p.ref IN (\'INT\',\'EXT\') ';
 	$sql.= '	OR fdet.description LIKE \'%Adhésion%\') ';
 	$sql.= '	AND YEAR(f.datef) = YEAR(CURDATE()) ';
 	$sql.= ')';
