@@ -314,9 +314,10 @@ function _create_and_send($PDOdb, $db, $user, $conf, $langs)
 	
 	$product = new Product($db);
 	$product->fetch(0,'ADI');
-	$TProductTypo['Interne'] = $product;
+	$TProductTypo['INT'] = $product;
+	$product = new Product($db);
 	$product->fetch(0,'ADE');
-	$TProductTypo['Externe'] = $product;
+	$TProductTypo['EXT'] = $product;
 	
 	if (!$error)
 	{
