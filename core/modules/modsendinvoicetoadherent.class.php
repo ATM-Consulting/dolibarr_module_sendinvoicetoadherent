@@ -192,7 +192,7 @@ class modsendinvoicetoadherent extends DolibarrModules
 		$this->menu = array();			// List of menus to add
 		$r=0;
 		
-		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=members',			                // Put 0 if this is a top menu
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=accountancy',			                // Put 0 if this is a top menu
 								'type'=>'left',			                // This is a Top menu entry
 								'titre'=>$langs->trans('sendinvoicetoadherentLeftMenuTitle'),
 								'mainmenu'=>'members',
@@ -206,7 +206,7 @@ class modsendinvoicetoadherent extends DolibarrModules
 								'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
 		$r++;
 		
-		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=members,fk_leftmenu=sendinvoicetoadherent',			                // Put 0 if this is a top menu
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=accountancy,fk_leftmenu=sendinvoicetoadherent',			                // Put 0 if this is a top menu
 								'type'=>'left',			                // This is a Top menu entry
 								'titre'=>$langs->trans('sendinvoicetoadherentLeftMenuTitleList'),
 								'mainmenu'=>'sendinvoicetoadherent',
@@ -220,7 +220,7 @@ class modsendinvoicetoadherent extends DolibarrModules
 								'user'=>2);				                // 0=Menu for internal users, 1=external users, 2=both
 		$r++;
 		
-		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=members,fk_leftmenu=sendinvoicetoadherent',			                // Put 0 if this is a top menu
+		$this->menu[$r]=array(	'fk_menu'=>'fk_mainmenu=accountancy,fk_leftmenu=sendinvoicetoadherent',			                // Put 0 if this is a top menu
 								'type'=>'left',			                // This is a Top menu entry
 								'titre'=>$langs->trans('sendinvoicetoadherentLeftMenuTitleListAvoir'),
 								'mainmenu'=>'sendinvoicetoadherent',
