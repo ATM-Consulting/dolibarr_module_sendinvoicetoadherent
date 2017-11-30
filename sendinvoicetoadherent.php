@@ -457,11 +457,8 @@ function _createAvoir(&$PDOdb, &$db, &$user, &$conf, &$langs)
 	
 	while ($row = $PDOdb->Get_line()) 
 	{
-		$fk_soc = $row->fk_soc;
-		$facnumber = $row->facnumber;
-	
 		$factureImpayee = new Facture($db);
-		if ($factureImpayee->fetch(null, $facnumber) <= 0)
+		if ($factureImpayee->fetch($row->rowid) <= 0)
 		{
 			$TFacnumberFetchError[] = $facnumber;
 			continue;
