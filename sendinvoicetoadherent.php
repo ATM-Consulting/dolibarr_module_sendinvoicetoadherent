@@ -4,6 +4,7 @@ require('config.php');
 require('./class/sendinvoicetoadherent.class.php');
 require('./lib/sendinvoicetoadherent.lib.php');
 dol_include_once('/societe/class/societe.class.php');
+dol_include_once('/compta/facture/class/facture.class.php');
 
 if(!$user->rights->sendinvoicetoadherent->read) accessforbidden();
 
@@ -77,7 +78,6 @@ function _list(&$PDOdb, &$db, &$user, &$conf, &$langs, $footer=1)
 		while ($row = $PDOdb->Get_line())
 		{
 			$societe->fetch($row->rowid);
-			//echo '<a target="_blank" style="float:left;" href="'.dol_buildpath('/adherents/card.php?rowid='.$row->rowid, 1).'">'.img_picto('', 'object_user').$row->rowid.'&nbsp;</a>';
 			echo $societe->getNomUrl(1).'<br>';
 		}
 
@@ -164,36 +164,13 @@ function _listAvoir(&$PDOdb, &$db, &$user, &$conf, &$langs, $footer=1)
 
 	if ($count > 0)
 	{
+		$facture = new Facture($db);
 		echo '<tr><td width="20%">'.$langs->trans("sendinvoicetoadherentViewLinkID").'</td><td width="80%">';
-		$old_id = 0;
-		$TAdherent = array();
-		//var_dump($TAdherent);
 		while ($row = $PDOdb->Get_line())
 		{
-			if (isset($TAdherent[$row->rowid])) $TAdherent[$row->rowid][] = $row->facnumber;
-			else $TAdherent[$row->rowid] = array($row->facnumber);
-		}
-		
-		foreach ($TAdherent as $fk_adherent => $TFacnumber)
-		{
-			echo '<span><a target="_blank" href="'.dol_buildpath('/adherents/card.php?rowid='.$fk_adherent, 1).'">'.img_picto('', 'object_user').$fk_adherent.'&nbsp;</a>';
-			echo '[';
-			
-			$nbFac = count($TFacnumber);
-			$i = 0;
-			foreach ($TFacnumber as $facnumber)
-			{
-				$i++;
-				echo '<a href="'.dol_buildpath('/compta/facture.php?ref='.$facnumber, 2).'">';
-				if ($i > 1) echo '<span style="color:red;">';
-				echo $facnumber;
-				if ($i > 1) echo '</span>';
-				echo '</a>';
-				
-				if ($nbFac > 1 && $i < $nbFac) echo ' - ';
-			}
-			
-			echo ']</span>&nbsp;&nbsp;';
+			$facture->fetch($row->$rowid);
+			$facture->fetch_thirdparty();
+			echo $facture->getNomUrl(1) . ' - '. $facture->thirdparty->getNomUrl(1).'<br>';
 		}
 
 		echo '</td><tr>';
@@ -226,7 +203,7 @@ function _listAvoir(&$PDOdb, &$db, &$user, &$conf, &$langs, $footer=1)
 
 	echo '</table></div>';
 
-	if ($user->rights->sendinvoicetoadherent->create)
+	if ($user->rights->sendinvoicetoadherent->create && $count > 0)
 	{
 		echo '<div class="tabsAction">';
 		echo '<a class="butAction" href="'.dol_buildpath('/sendinvoicetoadherent/sendinvoicetoadherent.php?action=createAvoir', 1).'">'.$langs->trans('sendinvoicetoadherentActionCreateAvoir').'</a>';
@@ -615,27 +592,15 @@ function _getSql()
 
 function _getSql2()
 {
-	global $conf;
+	// On récupère tous les tiers / factures pour lesquels ils faut faire un avoir sur l'adhésion pour l'année en cours (facture impayée)
+	$sql = 'SELECT f.rowid ';
+	$sql.= 'FROM '.MAIN_DB_PREFIX.'facture f ';
+	$sql.= 'LEFT JOIN '.MAIN_DB_PREFIX.'facturedet fdet ON (fdet.fk_facture = f.rowid) ';
+	$sql.= 'LEFT JOIN '.MAIN_DB_PREFIX.'product p ON (fdet.fk_product = p.rowid) ';
+	$sql.= 'WHERE (p.ref IN (\'ADI\',\'ADE\') ';
+	$sql.= 'OR fdet.description LIKE \'%Adhésion%\') ';
+	$sql.= 'AND YEAR(f.datef) = YEAR(CURDATE()) ';
+	$sql.= 'AND f.paye = 0 ';
 	
-	$fk_product_cotisation = (int) $conf->global->ADHERENT_PRODUCT_ID_FOR_SUBSCRIPTIONS;
-	
-	//Attention la requete peut renvoyer plusieurs fois le même id adhérent (s'il a +sieurs datef identique au max)
-	return "
-		SELECT a.rowid, a.fk_soc, f.facnumber #Je veux la liste des adhérents avec leur facture impayée 
-
-		FROM llx_adherent a 
-		INNER JOIN llx_societe s ON (s.rowid = a.fk_soc) 
-		INNER JOIN llx_facture f ON (f.fk_soc = s.rowid) 
-		WHERE a.entity = 1
-		AND f.datef = ( # filtre pour récupérer la facture la plus récente 
-		    SELECT MAX(ff.datef) 
-		    FROM llx_facture ff 
-		    INNER JOIN llx_facturedet ffd ON (ffd.fk_facture = ff.rowid AND ffd.fk_product = 1) 
-		    WHERE ff.fk_soc = f.fk_soc 
-		    AND ff.type = 0
-		    AND ff.fk_statut IN (0, 1)
-		    AND ff.datef < (CURDATE() - INTERVAL 6 MONTH)
-		    AND ff.rowid NOT IN (SELECT fff.fk_facture_source FROM llx_facture fff WHERE type = 2)
-		)
-	";
+	return $sql;
 }
