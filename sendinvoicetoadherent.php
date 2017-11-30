@@ -168,7 +168,7 @@ function _listAvoir(&$PDOdb, &$db, &$user, &$conf, &$langs, $footer=1)
 		echo '<tr><td width="20%">'.$langs->trans("sendinvoicetoadherentViewLinkID").'</td><td width="80%">';
 		while ($row = $PDOdb->Get_line())
 		{
-			$facture->fetch($row->$rowid);
+			$facture->fetch($row->rowid);
 			$facture->fetch_thirdparty();
 			echo $facture->getNomUrl(1) . ' - '. $facture->thirdparty->getNomUrl(1).'<br>';
 		}
