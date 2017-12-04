@@ -468,7 +468,7 @@ function _createAvoir(&$PDOdb, &$db, &$user, &$conf, &$langs)
 		
 		$facture = new Facture($db);
 		
-		$facture->socid = $fk_soc;
+		$facture->socid = $factureImpayee->socid;
 		$facture->fk_facture_source = $factureImpayee->id;
 		$facture->type = Facture::TYPE_CREDIT_NOTE;
 		$facture->date = $dateinvoice;
