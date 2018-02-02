@@ -574,6 +574,7 @@ function _getSql()
 	$sql.= 'FROM '.MAIN_DB_PREFIX.'societe s ';
 	$sql.= 'LEFT JOIN '.MAIN_DB_PREFIX.'societe_extrafields sext ON (sext.fk_object = s.rowid) ';
 	$sql.= 'WHERE sext.typologie IN (\'INT\',\'EXT\')';
+	$sql.= 'AND s.status = 1 ';
 	$sql.= 'AND s.rowid NOT IN ( '; // N' pas encore eu de facture d'adhésion (service ADI ou ADE) sur l'année en cours
 	$sql.= '	SELECT f.fk_soc ';
 	$sql.= '	FROM '.MAIN_DB_PREFIX.'facture f ';
